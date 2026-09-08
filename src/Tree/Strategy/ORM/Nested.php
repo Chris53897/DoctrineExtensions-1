@@ -478,7 +478,11 @@ class Nested implements Strategy
                 $criteria->andWhere(Criteria::expr()->eq($config['root'], $node->$method()));
                 $criteria->andWhere(Criteria::expr()->isNull($config['parent']));
                 $criteria->andWhere(Criteria::expr()->eq($config['level'], 0));
-                $criteria->orderBy([$config['right'] => function_exists('enum_exists') && enum_exists(Order::class) ? Order::Ascending : 'ASC']);
+                $order = 'ASC';
+                if (function_exists('enum_exists')) {
+                    $order = enum_exists(\SortDirection::class) ? \SortDirection::Ascending : (enum_exists(Order::class) ? Order::Ascending : 'ASC');
+                }
+                $criteria->orderBy([$config['right'] => $order]);
                 $roots = $repo->matching($criteria)->toArray();
                 $last = array_pop($roots);
 
